@@ -12,39 +12,36 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-
+# This module loads the images into NumPy arrays. 
 def get_img_array(imgs_dir):
     return [get_array(img) for img in os.listdir(imgs_dir)]
 
+# This module gets the height and width values for the padding. 
 def get_h_w(img_arrs):
     return max([[img_arrs[i].shape[0], img_arrs[i].shape[1]] for i in range(len(img_arrs))])
 
+# Adding the padding
 def get_padded(img_arrs, h, w):
     return [pad(img_arrs[i], h, w) for i in range(len(img_arrs))]
 
-
+# Normanizing the images. 
 def normalize(x):
     return (x - 128.0) / 128
-
+# This module loads the images into NumPy arrays
 def get_array(img):
     im = Image.open(img)
     return np.array(im)
 
-def pad(img, h, w):
-    top_pad = np.floor((h - img.shape[0]) / 2).astype(np.uint16)
-    bottom_pad = np.ceil((h - img.shape[0]) / 2).astype(np.uint16)
-    right_pad = np.ceil((w - img.shape[1]) / 2).astype(np.uint16)
-    left_pad = np.floor((w - img.shape[1]) / 2).astype(np.uint16)
-    return np.copy(np.pad(img, ((top_pad, bottom_pad), (left_pad, right_pad), (0, 0)), mode='constant', constant_values=0))
-
+# For histogram plotting 
 def plot_hist(img, col): 
     plt.hist(img, color = col, alpha = 0.5)
     plt.yscale('log')
 
-
+# Get the Grayscale image. 
 def rgb2gray(img):
     return np.dot(img[...,:3], [0.2989, 0.5870, 0.1140])
 
+# Plot the distributions
 def get_dist(channel, img):
     if channel == 'gray':
         return rgb2gray(img).ravel()
@@ -53,6 +50,7 @@ def get_dist(channel, img):
         if channel == colors[i]:
             return img[:, :, i].ravel()
 
+# Get the values in the Pandas DataFrames. 
 def get_df(channel, imgs_dir, padded_imgs):
     names_arr = ['Img index', 'Img name', ' Mean', ' Median', ' Mode']
     names_arr[2:] = [channel + names_arr[i] for i in range(2, len(names_arr))]
@@ -68,6 +66,7 @@ def get_histograms(channel, img, show):
     if show: 
         plt.show()
         
+# Get the triangle correlation map.         
 def get_triangle_corr(corr):
     f, ax = plt.subplots(figsize=(11, 9))
     mask = np.triu(np.ones_like(corr, dtype=np.bool))
